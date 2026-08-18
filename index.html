@@ -1,4 +1,4 @@
-<!doctype html>
+\<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -924,6 +924,23 @@
         font-size: 10.5px;
       }
 
+      .faq-lang-toggle {
+        padding: 5px 9px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.03);
+        font-size: 10.5px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .faq-lang-toggle:hover,
+      .faq-lang-toggle.active {
+        color: var(--cyan);
+        border-color: rgba(92, 225, 230, 0.4);
+      }
+
       .faq-close {
         display: grid;
         width: 26px;
@@ -1382,11 +1399,14 @@
           <strong>Toolkit assistant</strong>
           <span>Quick answers about each checker</span>
         </div>
-        <button type="button" class="faq-close" id="faq-close" aria-label="Close assistant">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
-            <path d="M5 5l14 14M19 5 5 19" />
-          </svg>
-        </button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="faq-lang-toggle" id="faq-lang-toggle" aria-label="Switch language">தமிழ்</button>
+          <button type="button" class="faq-close" id="faq-close" aria-label="Close assistant">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M5 5l14 14M19 5 5 19" />
+            </svg>
+          </button>
+        </div>
       </div>
       <div class="faq-messages" id="faq-messages" role="log" aria-live="polite"></div>
       <div class="faq-suggestions" id="faq-suggestions"></div>
@@ -1659,72 +1679,107 @@
       $("#age-input").addEventListener("keydown", (event) => event.key === "Enter" && checkAge());
       $("#ssl-input").addEventListener("keydown", (event) => event.key === "Enter" && checkSsl());
 
-      /* ---------- FAQ assistant ---------- */
+      /* ---------- FAQ assistant (English + Tamil) ---------- */
       const faqKnowledge = [
         {
           id: "url",
           keywords: ["url", "scanner", "link", "scan a link", "suspicious link"],
+          keywordsTa: ["முகவரி", "லிங்க்", "இணைப்பு", "ஸ்கேனர்", "url ஸ்கேனர்"],
           question: "What does the URL scanner do?",
-          answer: "The URL scanner looks at the shape of a link — things like missing HTTPS, embedded credentials, punycode, unusual ports, or brand-style wording in the hostname. It flags caution signals, but it isn't a reputation database, so always verify the destination another way too."
+          questionTa: "URL ஸ்கேனர் என்ன செய்யும்?",
+          answer: "The URL scanner looks at the shape of a link — things like missing HTTPS, embedded credentials, punycode, unusual ports, or brand-style wording in the hostname. It flags caution signals, but it isn't a reputation database, so always verify the destination another way too.",
+          answerTa: "URL ஸ்கேனர் ஒரு லிங்கின் அமைப்பை பரிசோதிக்கிறது — HTTPS இல்லாதது, பயனர்பெயர்/கடவுச்சொல் இணைக்கப்பட்டிருப்பது, punycode, வழக்கமற்ற port, அல்லது brand-style வார்த்தைகள் போன்றவை. இது எச்சரிக்கை சமிக்ஞைகளை மட்டுமே காட்டும், இது ஒரு reputation database அல்ல — எனவே இணைப்பை வேறு வழியிலும் சரிபார்க்கவும்."
         },
         {
           id: "age",
           keywords: ["age", "domain age", "how old", "registration", "rdap", "when was", "registered"],
+          keywordsTa: ["வயது", "டொமைன்", "பதிவு", "எப்போது", "domain வயது"],
           question: "How does the website age lookup work?",
-          answer: "It queries the public RDAP registry for a domain's registration date and reports how old it is. A very young domain isn't proof of anything bad, but it's a useful extra signal — especially combined with the URL scanner. If the registry request is blocked, it'll say the lookup is unavailable rather than guess."
+          questionTa: "வெப்சைட் வயது lookup எப்படி வேலை செய்யும்?",
+          answer: "It queries the public RDAP registry for a domain's registration date and reports how old it is. A very young domain isn't proof of anything bad, but it's a useful extra signal — especially combined with the URL scanner. If the registry request is blocked, it'll say the lookup is unavailable rather than guess.",
+          answerTa: "இது பொது RDAP registry-யிடம் டொமைனின் பதிவு தேதியை கேட்டு, அது எவ்வளவு பழையது என்று காட்டும். மிகப் புதிய டொமைன் என்பது தீங்கு என்பதற்கு ஆதாரம் அல்ல, ஆனால் URL ஸ்கேனருடன் சேர்த்துப் பயன்படுத்த உதவும் ஒரு கூடுதல் சமிக்ஞை. Registry request தடுக்கப்பட்டால், lookup கிடைக்கவில்லை என்று சொல்லும், ஊகிக்காது."
         },
         {
           id: "pdf",
           keywords: ["pdf", "file", "document", "attachment", "upload"],
+          keywordsTa: ["pdf", "கோப்பு", "ஆவணம்", "பதிவேற்றம்"],
           question: "Is my PDF uploaded anywhere?",
-          answer: "No — the PDF safety checker reads the file entirely in your browser. It confirms the file actually starts with a real PDF signature and scans the first couple megabytes for active-content markers like /JavaScript or /Launch. It never opens the document and nothing leaves your device."
+          questionTa: "என் PDF எங்காவது பதிவேற்றப்படுமா?",
+          answer: "No — the PDF safety checker reads the file entirely in your browser. It confirms the file actually starts with a real PDF signature and scans the first couple megabytes for active-content markers like /JavaScript or /Launch. It never opens the document and nothing leaves your device.",
+          answerTa: "இல்லை — PDF safety checker உங்கள் browser-க்குள்ளேயே கோப்பைப் படிக்கும். இது கோப்பு உண்மையிலேயே PDF signature-உடன் தொடங்குகிறதா என்று உறுதிசெய்து, முதல் சில மெகாபைட்டுகளில் /JavaScript, /Launch போன்ற active-content markers-ஐ சோதிக்கும். இது ஆவணத்தை திறக்காது, எதுவும் உங்கள் device-ஐ விட்டு வெளியேறாது."
         },
         {
           id: "password",
           keywords: ["password", "passphrase", "strength", "strong"],
+          keywordsTa: ["கடவுச்சொல்", "பாஸ்வேர்ட்", "வலிமை", "strength"],
           question: "How is password strength calculated?",
-          answer: "It scores length, character variety (upper/lower/numbers/symbols), and checks against a small list of very common passwords — all locally in your browser, nothing is sent anywhere. Longer, unique passphrases score best; storing it in a password manager and enabling MFA is always the next step."
+          questionTa: "கடவுச்சொல் வலிமை எப்படி கணக்கிடப்படுகிறது?",
+          answer: "It scores length, character variety (upper/lower/numbers/symbols), and checks against a small list of very common passwords — all locally in your browser, nothing is sent anywhere. Longer, unique passphrases score best; storing it in a password manager and enabling MFA is always the next step.",
+          answerTa: "இது நீளம், எழுத்து வகைகள் (பெரிய/சிறிய எழுத்துகள், எண்கள், சின்னங்கள்) மற்றும் பொதுவான கடவுச்சொற்களுடன் ஒப்பிட்டு மதிப்பெண் தரும் — இதெல்லாம் உங்கள் browser-க்குள்ளேயே நடக்கும், எதுவும் அனுப்பப்படாது. நீளமான, தனித்துவமான passphrase சிறந்தது; password manager-இல் சேமித்து MFA-ஐ இயக்குவது அடுத்த படி."
         },
         {
           id: "phishing",
           keywords: ["phishing", "email", "message", "scam", "suspicious message"],
+          keywordsTa: ["ஃபிஷிங்", "மோசடி", "மெசேஜ்", "செய்தி", "ஸ்கேம்"],
           question: "What does the phishing detector look for?",
-          answer: "It scans pasted text for common phishing patterns: urgency language, requests for credentials or payment, shortened links, mismatched sender patterns, and mixed-character links. It's a pattern check, not a verdict — always confirm the sender through a known, separate channel before acting."
+          questionTa: "ஃபிஷிங் டிடெக்டர் எதைத் தேடுகிறது?",
+          answer: "It scans pasted text for common phishing patterns: urgency language, requests for credentials or payment, shortened links, mismatched sender patterns, and mixed-character links. It's a pattern check, not a verdict — always confirm the sender through a known, separate channel before acting.",
+          answerTa: "இது ஒட்டப்பட்ட உரையில் பொதுவான ஃபிஷிங் தன்மைகளை சோதிக்கும்: அவசர மொழி, கடவுச்சொல்/பணம் கோரிக்கை, சுருக்கப்பட்ட லிங்குகள், பொருந்தாத அனுப்புநர் முறை, கலப்பு-எழுத்து லிங்குகள். இது ஒரு pattern check மட்டுமே, தீர்ப்பு அல்ல — எதுவும் செய்யும் முன் அனுப்புநரை தனி, தெரிந்த வழியில் உறுதிசெய்யவும்."
         },
         {
           id: "ssl",
           keywords: ["ssl", "https", "certificate", "encrypted", "encryption"],
+          keywordsTa: ["எஸ்எஸ்எல்", "சான்றிதழ்", "encryption", "https"],
           question: "What does the SSL checker actually verify?",
-          answer: "It confirms the URL uses HTTPS and then attempts a browser-safe reachability check. It's a starting-point check, not a full certificate audit — cross-origin restrictions can sometimes prevent the reachability confirmation even when the site is fine."
+          questionTa: "SSL checker உண்மையில் என்ன சரிபார்க்கும்?",
+          answer: "It confirms the URL uses HTTPS and then attempts a browser-safe reachability check. It's a starting-point check, not a full certificate audit — cross-origin restrictions can sometimes prevent the reachability confirmation even when the site is fine.",
+          answerTa: "இது URL HTTPS பயன்படுத்துகிறதா என்று உறுதிசெய்து, பிறகு browser-safe reachability சோதனை செய்யும். இது ஒரு தொடக்க-நிலை சோதனை, முழு certificate audit அல்ல — cross-origin கட்டுப்பாடுகள் சில நேரம் தளம் சரியாக இருந்தாலும் reachability உறுதிப்படுத்தலைத் தடுக்கலாம்."
         },
         {
           id: "privacy",
           keywords: ["privacy", "data", "store", "server", "save", "collect", "tracking"],
+          keywordsTa: ["தனியுரிமை", "தரவு", "சேமிப்பு", "சேவையகம்"],
           question: "Do any of these tools store or send my data?",
-          answer: "Everything here runs client-side in your browser. The password, phishing, and PDF tools never leave your device at all. The domain age and SSL tools make direct, minimal requests to public services (RDAP / the target site) only to fetch the specific fact you asked about — nothing is logged by CyberShieldHub."
+          questionTa: "இந்த கருவிகள் என் தரவை சேமிக்குமா அல்லது அனுப்புமா?",
+          answer: "Everything here runs client-side in your browser. The password, phishing, and PDF tools never leave your device at all. The domain age and SSL tools make direct, minimal requests to public services (RDAP / the target site) only to fetch the specific fact you asked about — nothing is logged by CyberShieldHub.",
+          answerTa: "இங்கு எல்லாமே உங்கள் browser-க்குள்ளேயே இயங்கும். கடவுச்சொல், ஃபிஷிங், PDF கருவிகள் உங்கள் device-ஐ விட்டு ஒருபோதும் வெளியேறாது. டொமைன் வயது மற்றும் SSL கருவிகள் மட்டும் நீங்கள் கேட்ட குறிப்பிட்ட தகவலைப் பெற பொது சேவைகளுக்கு (RDAP / இலக்கு தளம்) நேரடி, குறைந்தபட்ச கோரிக்கை அனுப்பும் — CyberShieldHub எதையும் பதிவு செய்யாது."
         },
         {
           id: "accuracy",
           keywords: ["accurate", "guarantee", "reliable", "trust", "certain", "sure"],
+          keywordsTa: ["துல்லியம்", "நம்பகத்தன்மை", "உத்தரவாதம்"],
           question: "How accurate are these checks?",
-          answer: "Think of them as guidance signals, not guarantees — that's why the footer says 'use as a guide, not a guarantee.' They're good for a fast first pass, but for anything high-stakes, cross-check with a dedicated security service or your organization's IT/security team."
+          questionTa: "இந்த சோதனைகள் எவ்வளவு துல்லியமானவை?",
+          answer: "Think of them as guidance signals, not guarantees — that's why the footer says 'use as a guide, not a guarantee.' They're good for a fast first pass, but for anything high-stakes, cross-check with a dedicated security service or your organization's IT/security team.",
+          answerTa: "இவற்றை வழிகாட்டி சமிக்ஞைகளாகவே பாருங்கள், உத்தரவாதமாக அல்ல — அதனால்தான் footer-இல் 'வழிகாட்டியாக பயன்படுத்துங்கள், உத்தரவாதமாக அல்ல' என்று உள்ளது. இவை வேகமான முதல் பரிசோதனைக்கு நல்லது, ஆனால் முக்கியமான விஷயங்களுக்கு ஒரு பாதுகாப்பு சேவை அல்லது உங்கள் நிறுவனத்தின் IT/security குழுவுடன் சரிபார்க்கவும்."
         }
       ];
 
-      const faqFallback = "I can help with the six tools here: URL scanner, website age lookup, PDF safety checker, password strength, phishing detection, and SSL checker. Try asking something like \"what does the URL scanner check?\" or \"is my PDF uploaded?\"";
+      const faqFallbackEn = "I can help with the six tools here: URL scanner, website age lookup, PDF safety checker, password strength, phishing detection, and SSL checker. Try asking something like \"what does the URL scanner check?\" or \"is my PDF uploaded?\"";
+      const faqFallbackTa = "இங்கு உள்ள ஆறு கருவிகள் பற்றி நான் உதவ முடியும்: URL ஸ்கேனர், வெப்சைட் வயது, PDF safety checker, கடவுச்சொல் வலிமை, ஃபிஷிங் டிடெக்‌ஷன், SSL checker. \"URL ஸ்கேனர் என்ன சோதிக்கும்?\" அல்லது \"என் PDF பதிவேற்றப்படுமா?\" போன்று கேளுங்கள்.";
+
+      const tamilPattern = /[\u0B80-\u0BFF]/;
+      let faqLang = "en";
+
+      function faqDetectLang(text) {
+        return tamilPattern.test(text) ? "ta" : faqLang;
+      }
 
       function faqAnswer(question) {
+        const lang = faqDetectLang(question);
         const text = question.toLowerCase();
         let best = null;
         let bestScore = 0;
         faqKnowledge.forEach((entry) => {
-          const score = entry.keywords.reduce((total, keyword) => total + (text.includes(keyword) ? keyword.split(" ").length : 0), 0);
+          const list = lang === "ta" ? entry.keywordsTa.concat(entry.keywords) : entry.keywords;
+          const score = list.reduce((total, keyword) => total + (text.includes(keyword.toLowerCase()) ? keyword.split(" ").length : 0), 0);
           if (score > bestScore) {
             bestScore = score;
             best = entry;
           }
         });
-        return best ? best.answer : faqFallback;
+        if (best) return lang === "ta" ? best.answerTa : best.answer;
+        return lang === "ta" ? faqFallbackTa : faqFallbackEn;
       }
 
       function faqAddMessage(role, text) {
@@ -1743,8 +1798,8 @@
           const chip = document.createElement("button");
           chip.type = "button";
           chip.className = "faq-chip";
-          chip.textContent = entry.question;
-          chip.addEventListener("click", () => faqAsk(entry.question));
+          chip.textContent = faqLang === "ta" ? entry.questionTa : entry.question;
+          chip.addEventListener("click", () => faqAsk(chip.textContent));
           wrap.appendChild(chip);
         });
       }
@@ -1756,13 +1811,21 @@
         setTimeout(() => faqAddMessage("bot", faqAnswer(trimmed)), 220);
       }
 
+      function faqSetLang(lang) {
+        faqLang = lang;
+        const toggle = $("#faq-lang-toggle");
+        toggle.textContent = lang === "ta" ? "English" : "தமிழ்";
+        $("#faq-input").placeholder = lang === "ta" ? "ஒரு கேள்வி கேளுங்கள்…" : "Ask about a tool…";
+        faqRenderSuggestions();
+      }
+
       let faqInitialized = false;
       function faqOpen() {
         $("#faq-panel").classList.add("open");
         $("#faq-launcher").setAttribute("aria-expanded", "true");
         if (!faqInitialized) {
           faqInitialized = true;
-          faqAddMessage("bot", "Hi! I'm the toolkit assistant — ask me what any of the checkers do, or whether your data leaves your device.");
+          faqAddMessage("bot", "Hi! I'm the toolkit assistant — ask me what any of the checkers do, or whether your data leaves your device. (தமிழிலும் கேட்கலாம்!)");
           faqRenderSuggestions();
         }
         $("#faq-input").focus();
@@ -1777,6 +1840,7 @@
         $("#faq-panel").classList.contains("open") ? faqCloseFn() : faqOpen();
       });
       $("#faq-close").addEventListener("click", faqCloseFn);
+      $("#faq-lang-toggle").addEventListener("click", () => faqSetLang(faqLang === "ta" ? "en" : "ta"));
       $("#faq-form").addEventListener("submit", (event) => {
         event.preventDefault();
         const input = $("#faq-input");
