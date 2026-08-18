@@ -846,6 +846,196 @@
         border: 0;
       }
 
+      .faq-launcher {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        z-index: 60;
+        display: grid;
+        width: 56px;
+        height: 56px;
+        place-items: center;
+        border: 1px solid rgba(92, 225, 230, 0.3);
+        border-radius: 50%;
+        color: #06101b;
+        background: linear-gradient(135deg, var(--cyan), #a2f6dd);
+        box-shadow: 0 14px 34px rgba(92, 225, 230, 0.28);
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .faq-launcher:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 40px rgba(92, 225, 230, 0.34);
+      }
+
+      .faq-launcher svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      .faq-launcher .faq-dot {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 10px;
+        height: 10px;
+        border: 2px solid var(--bg);
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      .faq-panel {
+        position: fixed;
+        right: 22px;
+        bottom: 90px;
+        z-index: 60;
+        display: none;
+        width: min(340px, calc(100vw - 44px));
+        max-height: min(480px, calc(100vh - 140px));
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(155, 187, 239, 0.2);
+        border-radius: 18px;
+        background: linear-gradient(160deg, rgba(23, 35, 65, 0.98), rgba(11, 18, 37, 0.98));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(16px);
+      }
+
+      .faq-panel.open {
+        display: flex;
+        animation: rise 200ms ease both;
+      }
+
+      .faq-panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .faq-panel-head strong {
+        display: block;
+        font-size: 13px;
+      }
+
+      .faq-panel-head span {
+        color: var(--muted);
+        font-size: 10.5px;
+      }
+
+      .faq-close {
+        display: grid;
+        width: 26px;
+        height: 26px;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .faq-close:hover {
+        color: var(--text);
+        border-color: rgba(92, 225, 230, 0.4);
+      }
+
+      .faq-messages {
+        flex: 1;
+        min-height: 200px;
+        max-height: 300px;
+        padding: 14px 16px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .faq-msg {
+        max-width: 86%;
+        padding: 9px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .faq-msg.bot {
+        align-self: flex-start;
+        border: 1px solid var(--line);
+        border-bottom-left-radius: 4px;
+        background: rgba(255, 255, 255, 0.045);
+        color: #dbe4f6;
+      }
+
+      .faq-msg.user {
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        background: rgba(92, 225, 230, 0.16);
+        color: var(--text);
+      }
+
+      .faq-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 0 16px 12px;
+      }
+
+      .faq-chip {
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--muted);
+        font-size: 10.5px;
+        font-weight: 600;
+      }
+
+      .faq-chip:hover {
+        color: var(--cyan);
+        border-color: rgba(92, 225, 230, 0.4);
+      }
+
+      .faq-input-row {
+        display: flex;
+        gap: 8px;
+        padding: 12px;
+        border-top: 1px solid var(--line);
+      }
+
+      .faq-input-row input {
+        flex: 1;
+        min-height: 38px;
+        padding: 0 12px;
+        border: 1px solid rgba(166, 188, 228, 0.16);
+        border-radius: 10px;
+        outline: 0;
+        background: rgba(3, 8, 20, 0.5);
+        color: var(--text);
+        font-size: 12px;
+      }
+
+      .faq-input-row input:focus {
+        border-color: rgba(92, 225, 230, 0.7);
+      }
+
+      .faq-send {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 0;
+        border-radius: 10px;
+        color: #06101b;
+        background: var(--cyan);
+      }
+
+      .faq-send svg {
+        width: 16px;
+        height: 16px;
+      }
+
       @media (max-width: 850px) {
         nav a:not(.nav-cta) {
           display: none;
@@ -1178,6 +1368,39 @@
       </div>
     </footer>
 
+    <button type="button" class="faq-launcher" id="faq-launcher" aria-expanded="false" aria-controls="faq-panel" aria-label="Open toolkit FAQ assistant">
+      <span class="faq-dot" aria-hidden="true"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 5.5h16v11H9.5L5 20v-3.5H4z" />
+        <path d="M8 9.5h8M8 12.7h5" />
+      </svg>
+    </button>
+
+    <div class="faq-panel" id="faq-panel" role="dialog" aria-label="Toolkit FAQ assistant">
+      <div class="faq-panel-head">
+        <div>
+          <strong>Toolkit assistant</strong>
+          <span>Quick answers about each checker</span>
+        </div>
+        <button type="button" class="faq-close" id="faq-close" aria-label="Close assistant">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M5 5l14 14M19 5 5 19" />
+          </svg>
+        </button>
+      </div>
+      <div class="faq-messages" id="faq-messages" role="log" aria-live="polite"></div>
+      <div class="faq-suggestions" id="faq-suggestions"></div>
+      <form class="faq-input-row" id="faq-form">
+        <label class="sr-only" for="faq-input">Ask a question about the tools</label>
+        <input id="faq-input" type="text" placeholder="Ask about a tool…" autocomplete="off" />
+        <button class="faq-send" type="submit" aria-label="Send question">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M4 12h16M13 5l7 7-7 7" />
+          </svg>
+        </button>
+      </form>
+    </div>
+
     <script>
       const $ = (selector) => document.querySelector(selector);
 
@@ -1435,6 +1658,131 @@
       $("#url-input").addEventListener("keydown", (event) => event.key === "Enter" && scanUrl());
       $("#age-input").addEventListener("keydown", (event) => event.key === "Enter" && checkAge());
       $("#ssl-input").addEventListener("keydown", (event) => event.key === "Enter" && checkSsl());
+
+      /* ---------- FAQ assistant ---------- */
+      const faqKnowledge = [
+        {
+          id: "url",
+          keywords: ["url", "scanner", "link", "scan a link", "suspicious link"],
+          question: "What does the URL scanner do?",
+          answer: "The URL scanner looks at the shape of a link — things like missing HTTPS, embedded credentials, punycode, unusual ports, or brand-style wording in the hostname. It flags caution signals, but it isn't a reputation database, so always verify the destination another way too."
+        },
+        {
+          id: "age",
+          keywords: ["age", "domain age", "how old", "registration", "rdap", "when was", "registered"],
+          question: "How does the website age lookup work?",
+          answer: "It queries the public RDAP registry for a domain's registration date and reports how old it is. A very young domain isn't proof of anything bad, but it's a useful extra signal — especially combined with the URL scanner. If the registry request is blocked, it'll say the lookup is unavailable rather than guess."
+        },
+        {
+          id: "pdf",
+          keywords: ["pdf", "file", "document", "attachment", "upload"],
+          question: "Is my PDF uploaded anywhere?",
+          answer: "No — the PDF safety checker reads the file entirely in your browser. It confirms the file actually starts with a real PDF signature and scans the first couple megabytes for active-content markers like /JavaScript or /Launch. It never opens the document and nothing leaves your device."
+        },
+        {
+          id: "password",
+          keywords: ["password", "passphrase", "strength", "strong"],
+          question: "How is password strength calculated?",
+          answer: "It scores length, character variety (upper/lower/numbers/symbols), and checks against a small list of very common passwords — all locally in your browser, nothing is sent anywhere. Longer, unique passphrases score best; storing it in a password manager and enabling MFA is always the next step."
+        },
+        {
+          id: "phishing",
+          keywords: ["phishing", "email", "message", "scam", "suspicious message"],
+          question: "What does the phishing detector look for?",
+          answer: "It scans pasted text for common phishing patterns: urgency language, requests for credentials or payment, shortened links, mismatched sender patterns, and mixed-character links. It's a pattern check, not a verdict — always confirm the sender through a known, separate channel before acting."
+        },
+        {
+          id: "ssl",
+          keywords: ["ssl", "https", "certificate", "encrypted", "encryption"],
+          question: "What does the SSL checker actually verify?",
+          answer: "It confirms the URL uses HTTPS and then attempts a browser-safe reachability check. It's a starting-point check, not a full certificate audit — cross-origin restrictions can sometimes prevent the reachability confirmation even when the site is fine."
+        },
+        {
+          id: "privacy",
+          keywords: ["privacy", "data", "store", "server", "save", "collect", "tracking"],
+          question: "Do any of these tools store or send my data?",
+          answer: "Everything here runs client-side in your browser. The password, phishing, and PDF tools never leave your device at all. The domain age and SSL tools make direct, minimal requests to public services (RDAP / the target site) only to fetch the specific fact you asked about — nothing is logged by CyberShieldHub."
+        },
+        {
+          id: "accuracy",
+          keywords: ["accurate", "guarantee", "reliable", "trust", "certain", "sure"],
+          question: "How accurate are these checks?",
+          answer: "Think of them as guidance signals, not guarantees — that's why the footer says 'use as a guide, not a guarantee.' They're good for a fast first pass, but for anything high-stakes, cross-check with a dedicated security service or your organization's IT/security team."
+        }
+      ];
+
+      const faqFallback = "I can help with the six tools here: URL scanner, website age lookup, PDF safety checker, password strength, phishing detection, and SSL checker. Try asking something like \"what does the URL scanner check?\" or \"is my PDF uploaded?\"";
+
+      function faqAnswer(question) {
+        const text = question.toLowerCase();
+        let best = null;
+        let bestScore = 0;
+        faqKnowledge.forEach((entry) => {
+          const score = entry.keywords.reduce((total, keyword) => total + (text.includes(keyword) ? keyword.split(" ").length : 0), 0);
+          if (score > bestScore) {
+            bestScore = score;
+            best = entry;
+          }
+        });
+        return best ? best.answer : faqFallback;
+      }
+
+      function faqAddMessage(role, text) {
+        const list = $("#faq-messages");
+        const bubble = document.createElement("div");
+        bubble.className = `faq-msg ${role}`;
+        bubble.textContent = text;
+        list.appendChild(bubble);
+        list.scrollTop = list.scrollHeight;
+      }
+
+      function faqRenderSuggestions() {
+        const wrap = $("#faq-suggestions");
+        wrap.innerHTML = "";
+        faqKnowledge.slice(0, 4).forEach((entry) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "faq-chip";
+          chip.textContent = entry.question;
+          chip.addEventListener("click", () => faqAsk(entry.question));
+          wrap.appendChild(chip);
+        });
+      }
+
+      function faqAsk(question) {
+        const trimmed = question.trim();
+        if (!trimmed) return;
+        faqAddMessage("user", trimmed);
+        setTimeout(() => faqAddMessage("bot", faqAnswer(trimmed)), 220);
+      }
+
+      let faqInitialized = false;
+      function faqOpen() {
+        $("#faq-panel").classList.add("open");
+        $("#faq-launcher").setAttribute("aria-expanded", "true");
+        if (!faqInitialized) {
+          faqInitialized = true;
+          faqAddMessage("bot", "Hi! I'm the toolkit assistant — ask me what any of the checkers do, or whether your data leaves your device.");
+          faqRenderSuggestions();
+        }
+        $("#faq-input").focus();
+      }
+
+      function faqCloseFn() {
+        $("#faq-panel").classList.remove("open");
+        $("#faq-launcher").setAttribute("aria-expanded", "false");
+      }
+
+      $("#faq-launcher").addEventListener("click", () => {
+        $("#faq-panel").classList.contains("open") ? faqCloseFn() : faqOpen();
+      });
+      $("#faq-close").addEventListener("click", faqCloseFn);
+      $("#faq-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = $("#faq-input");
+        faqAsk(input.value);
+        input.value = "";
+      });
     </script>
   </body>
 </html>
