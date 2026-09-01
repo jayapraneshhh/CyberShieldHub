@@ -2527,6 +2527,71 @@
         }
       }
 
+      // Frequently-impersonated brand domains, used for lookalike/typosquat detection.
+      const KNOWN_BRAND_DOMAINS = [
+        "google.com", "youtube.com", "gmail.com", "facebook.com", "instagram.com",
+        "whatsapp.com", "amazon.com", "apple.com", "icloud.com", "microsoft.com",
+        "outlook.com", "office.com", "live.com", "paypal.com", "netflix.com",
+        "twitter.com", "x.com", "linkedin.com", "bankofamerica.com", "chase.com",
+        "wellsfargo.com", "dropbox.com", "adobe.com", "ebay.com", "yahoo.com",
+        "steamcommunity.com", "steampowered.com", "coinbase.com", "binance.com",
+        "github.com", "wordpress.com"
+      ];
+
+      // Map common leetspeak / lookalike characters back to their letter equivalents
+      // so "g00gle" and "google" normalize to the same string for comparison.
+      function normalizeHomoglyphs(host) {
+        return host
+          .replace(/0/g, "o")
+          .replace(/1/g, "l")
+          .replace(/3/g, "e")
+          .replace(/5/g, "s")
+          .replace(/7/g, "t")
+          .replace(/4/g, "a")
+          .replace(/8/g, "b")
+          .replace(/rn/g, "m")
+          .replace(/vv/g, "w")
+          .replace(/\|/g, "l");
+      }
+
+      // Classic Levenshtein edit distance between two strings.
+      function levenshtein(a, b) {
+        const rows = a.length + 1;
+        const cols = b.length + 1;
+        const matrix = Array.from({ length: rows }, (_, i) => [i, ...Array(cols - 1).fill(0)]);
+        for (let j = 0; j < cols; j++) matrix[0][j] = j;
+        for (let i = 1; i < rows; i++) {
+          for (let j = 1; j < cols; j++) {
+            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j] + 1,
+              matrix[i][j - 1] + 1,
+              matrix[i - 1][j - 1] + cost
+            );
+          }
+        }
+        return matrix[rows - 1][cols - 1];
+      }
+
+      // Compares a hostname against the known-brand list, both as typed and after
+      // normalizing homoglyphs, and flags close-but-not-exact matches as impersonation.
+      function detectImpersonation(host) {
+        const strippedHost = host.replace(/^www\./, "");
+        const normalizedHost = normalizeHomoglyphs(strippedHost);
+        for (const brand of KNOWN_BRAND_DOMAINS) {
+          if (strippedHost === brand) return null; // exact legitimate match, not impersonation
+          // Normalizing homoglyphs made it match a brand exactly (e.g. go0gle.com -> google.com):
+          // this is the clearest impersonation signal, regardless of raw edit distance.
+          if (normalizedHost === brand) return brand;
+          const distanceRaw = levenshtein(strippedHost, brand);
+          const threshold = brand.length <= 8 ? 1 : 2;
+          if (distanceRaw > 0 && distanceRaw <= threshold) {
+            return brand;
+          }
+        }
+        return null;
+      }
+
       function scanUrl() {
         const raw = $("#url-input").value.trim();
         const url = getUrlValue(raw);
@@ -2545,19 +2610,24 @@
         if (host.length > 55) signals.push("very long hostname");
         const riskyWords = ["verify", "secure", "account", "signin", "login", "wallet", "update", "invoice"];
         if (riskyWords.some((word) => host.includes(word))) signals.push("brand-action wording");
+        const impersonatedBrand = detectImpersonation(host);
+        if (impersonatedBrand) signals.push(`looks like a lookalike of ${impersonatedBrand}`);
         if (signals.length === 0) {
           showResult("url-result", "No obvious red flags found", `${escapeHtml(host)} uses a straightforward URL shape. Still verify the sender and destination before entering sensitive information.`, "good", "URL scanner");
+        } else if (impersonatedBrand) {
+          showResult("url-result", `Possible impersonation of ${impersonatedBrand}`, `${escapeHtml(signals.join(", "))}. This domain closely resembles a well-known brand but is not an exact match — treat it as untrustworthy until proven otherwise.`, "danger", "URL scanner");
         } else {
           showResult("url-result", `${signals.length} caution signal${signals.length > 1 ? "s" : ""} found`, `${escapeHtml(signals.join(", "))}. This is a pattern check, not a reputation verdict — investigate further before continuing.`, signals.length > 2 ? "danger" : "warning", "URL scanner");
         }
       }
 
       async function checkAge() {
-        const raw = $("#age-input").value.trim().replace(/^https?:\/\//i, "").split("/")[0];
+        const raw = $("#age-input").value.trim().replace(/^https?:\/\//i, "").split("/")[0].toLowerCase();
         if (!raw || !raw.includes(".")) {
           showResult("age-result", "Enter a domain name", "Try a value such as example.com.", "danger");
           return;
         }
+        const impersonatedBrand = detectImpersonation(raw);
         showResult("age-result", "Checking public registry data…", "Asking the RDAP service for the domain's registration events.");
         try {
           const response = await fetch(`https://rdap.org/domain/${encodeURIComponent(raw)}`, { headers: { Accept: "application/rdap+json" } });
@@ -2568,9 +2638,17 @@
           const registered = new Date(event.eventDate);
           const ageYears = (Date.now() - registered.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
           const label = ageYears < 1 ? "Less than a year old" : `${ageYears.toFixed(1)} years old`;
-          showResult("age-result", `${escapeHtml(raw)} · ${label}`, `Public registration date: ${registered.toLocaleDateString()}. A young domain is not automatically malicious, but it is a useful caution signal.`, ageYears < 1 ? "warning" : "good", "Website age lookup");
+          if (impersonatedBrand) {
+            showResult("age-result", `${escapeHtml(raw)} looks like a lookalike of ${impersonatedBrand}`, `This domain is ${label.toLowerCase()} (registered ${registered.toLocaleDateString()}), but its name closely resembles ${impersonatedBrand} rather than matching it exactly. Age alone does not make a lookalike domain safe — a long-registered domain can still be used for impersonation. Treat it as untrustworthy until proven otherwise.`, "danger", "Website age lookup");
+          } else {
+            showResult("age-result", `${escapeHtml(raw)} · ${label}`, `Public registration date: ${registered.toLocaleDateString()}. A young domain is not automatically malicious, but it is a useful caution signal.`, ageYears < 1 ? "warning" : "good", "Website age lookup");
+          }
         } catch {
-          showResult("age-result", "Registry lookup unavailable", "The public RDAP request was blocked or did not return a registration date. Try again or use ICANN Lookup for a second source.", "warning", "Website age lookup");
+          if (impersonatedBrand) {
+            showResult("age-result", `${escapeHtml(raw)} looks like a lookalike of ${impersonatedBrand}`, `The public RDAP request was blocked or returned no data, but this domain name closely resembles ${impersonatedBrand} rather than matching it exactly. Treat it as untrustworthy regardless of the registry lookup result.`, "danger", "Website age lookup");
+          } else {
+            showResult("age-result", "Registry lookup unavailable", "The public RDAP request was blocked or did not return a registration date. Try again or use ICANN Lookup for a second source.", "warning", "Website age lookup");
+          }
         }
       }
 
